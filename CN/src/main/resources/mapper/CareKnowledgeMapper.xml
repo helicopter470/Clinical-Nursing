@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CareKnowledgeMapper">
+
+    <select id="selectAll" resultType="com.example.entity.CareKnowledge">
+        select * from careKnowledge
+        <where>
+            <if test="title!=null">and title like concat('%',#{title},'%')</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.CareKnowledge" useGeneratedKeys="true">
+        insert into careKnowledge(id,picture,title,introduction,content,time,click_num)
+        values (#{id},#{picture},#{title},#{introduction},#{content},#{time},#{clickNum})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.CareKnowledge">
+        update careKnowledge set picture=#{picture},title=#{title},introduction=#{introduction},content=#{content},time=#{time},click_num=#{clickNum}
+        where id=#{id}
+    </update>
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.NurseServiceMapper">
+
+    <select id="selectAll" resultType="com.example.entity.NurseService">
+        select * from nurseservice
+        <where>
+            <if test="name!=null">and name like concat('%',#{name},'%')</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.NurseService" useGeneratedKeys="true">
+        insert into nurseservice(id,name,picture,introduction,price)
+        values (#{id},#{name},#{picture},#{introduction},#{price})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.NurseService">
+        update nurseservice set name=#{name},picture=#{picture},introduction=#{introduction},price=#{price}
+        where id=#{id}
+    </update>
+</mapper>

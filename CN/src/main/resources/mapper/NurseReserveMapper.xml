@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.NurseReserveMapper">
+
+    <select id="selectAll" resultType="com.example.entity.NurseReserve">
+        select nursereserve.* , patient.name AS patientName , nurse.name AS nurseName
+        FROM nursereserve
+        LEFT JOIN patient ON nursereserve.patient_id = patient.id
+        LEFT JOIN nurse ON nursereserve.nurse_id = nurse.id
+        <include refid="com.example.mapper.CommonSql.filterByNameAndUsers"/>
+    </select>
+
+    <select id="selectPatientsByNurseInService" resultType="com.example.entity.Patient" parameterType="int">
+        SELECT DISTINCT patient.*
+        FROM nursereserve
+                 LEFT JOIN patient ON nursereserve.patient_id = patient.id
+        WHERE nursereserve.nurse_id = #{nurseId}
+          AND nursereserve.status = '服务中'
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.NurseReserve" useGeneratedKeys="true">
+        insert into nursereserve(id,start_date,end_date,status,application_time,reserve_option,patient_id,nurse_id)
+        values (#{id},#{startDate},#{endDate},#{status},#{applicationTime},#{reserveOption},
+                #{patientId},#{nurseId})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.NurseReserve">
+        update nursereserve set start_date=#{startDate},end_date=#{endDate},status=#{status},application_time=#{applicationTime},
+                                reserve_option=#{reserveOption},patient_id=#{patientId},nurse_id=#{nurseId}
+        where id=#{id}
+    </update>
+</mapper>

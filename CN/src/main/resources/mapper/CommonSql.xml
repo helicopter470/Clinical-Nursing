@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CommonSql">
+    <!-- 可被各 Mapper 引用的通用过滤条件 -->
+    <sql id="filterByNameAndUsers">
+        <where>
+            <if test="name != null and name != ''">
+                and patient.name like concat('%',#{name},'%')
+            </if>
+            <if test="nurseName != null and nurseName != ''">
+                and nurse.name like concat('%',#{nurseName},'%')
+            </if>
+            <if test="patientId != null">
+                and patient.id = #{patientId}
+            </if>
+            <if test="nurseId != null">
+                and nurse.id = #{nurseId}
+            </if>
+            <if test="record != null and record != ''">
+                and DATE_FORMAT(record, '%Y-%m-%d') = #{record}
+            </if>
+        </where>
+    </sql>
+</mapper>

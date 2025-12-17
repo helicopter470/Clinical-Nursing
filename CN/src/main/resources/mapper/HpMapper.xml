@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.HpMapper">
+
+    <select id="selectAll" resultType="com.example.entity.Hp">
+        select hp.* , patient.name AS patientName , ward.name AS wardName ,patient.phone AS patientPhone
+        FROM hp
+        LEFT JOIN patient ON hp.patient_id = patient.id
+        LEFT JOIN ward ON hp.ward_id = ward.id
+        <include refid="com.example.mapper.CommonSql.filterByNameAndUsers"/>
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.Hp" useGeneratedKeys="true">
+        insert into hp(id,bed_num,illness,illness_desc,treatment,status,admit_date,discharge_date,emergency_contact,emergency_phone,patient_id,ward_id,phone_id)
+        values (#{id},#{bedNum},#{illness},#{illnessDesc},#{treatment},#{status},#{admitDate},#{dischargeDate},#{emergencyContact},#{emergencyPhone},
+                #{patientId},#{wardId},#{phoneId})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Hp">
+        update hp set bed_num=#{bedNum},illness=#{illness},illness_desc=#{illnessDesc},treatment=#{treatment},status=#{status},admit_date=#{admitDate},
+                      discharge_date=#{dischargeDate},emergency_contact=#{emergencyContact},emergency_phone=#{emergencyPhone},patient_id=#{patientId},
+                      ward_id=#{wardId},phone_id=#{phoneId}
+        where id=#{id}
+    </update>
+</mapper>

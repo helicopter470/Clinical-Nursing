@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.WardMapper">
+
+    <select id="selectAll" resultType="com.example.entity.Ward">
+        select * from ward
+        <where>
+            <if test="name!=null">and name like concat('%',#{name},'%')</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.Ward" useGeneratedKeys="true">
+        insert into ward(id,name,level,position,ward_name)
+        values (#{id},#{name},#{level},#{position},#{wardName})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Ward">
+        update ward set name=#{name},level=#{level},position=#{position},ward_name=#{wardName}
+        where id=#{id}
+    </update>
+</mapper>

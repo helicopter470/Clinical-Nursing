@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.DailyMonitorMapper">
+
+    <select id="selectAll" resultType="com.example.entity.DailyMonitor">
+        select dailymonitor.* , patient.name AS patientName,nurse.name AS nurseName,ward.name AS wardName,hp.bed_num AS bedNum
+        FROM dailymonitor
+        LEFT JOIN patient ON dailymonitor.patient_id = patient.id
+        LEFT JOIN nurse ON dailymonitor.nurse_id = nurse.id
+        LEFT JOIN ward ON dailymonitor.ward_id = ward.id
+        LEFT JOIN hp ON dailymonitor.bed_id = hp.id
+        <include refid="com.example.mapper.CommonSql.filterByNameAndUsers"/>
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.DailyMonitor" useGeneratedKeys="true">
+        insert into dailymonitor(id,blood,temp,pluse,breathe,mental,dietary,record,remark,patient_id,nurse_id,ward_id,bed_id)
+        values (#{id},#{blood},#{temp},#{pulse},#{breathe},#{mental},#{dietary},#{record},#{remark},#{patientId},#{nurseId},#{wardId},#{bedId})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.DailyMonitor">
+        update dailymonitor set blood=#{blood},temp=#{temp},pulse=#{pulse},breathe=#{breathe},mental=#{mental},dietary=#{dietary},
+                                record=#{record},remark=#{remark},patient_id=#{patientId},nurse_id=#{nurseId},
+                                ward_id=#{wardId},bed_id=#{bedId}
+        where id=#{id}
+    </update>
+</mapper>

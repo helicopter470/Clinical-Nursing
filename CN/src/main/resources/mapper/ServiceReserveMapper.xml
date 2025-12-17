@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ServiceReserveMapper">
+
+    <select id="selectAll" resultType="com.example.entity.ServiceReserve" parameterType="map">
+        select servicereserve.* , patient.name AS patientName,nurse.name AS nurseName,nurseservice.name AS serverName
+        FROM servicereserve
+        LEFT JOIN patient ON servicereserve.patient_id = patient.id
+        LEFT JOIN nurse ON servicereserve.nurse_id = nurse.id
+        LEFT JOIN nurseservice ON servicereserve.service_id = nurseservice.id
+        <include refid="com.example.mapper.CommonSql.filterByNameAndUsers"/>
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.ServiceReserve" useGeneratedKeys="true">
+        insert into servicereserve(id,start_date,end_date,price,application_time,status,reserve_option,review,service_id,patient_id,nurse_id)
+        values (#{id},#{startDate},#{endDate},#{price},#{applicationTime},#{status},#{reserveOption},#{review},#{serviceId},
+                #{patientId},#{nurseId})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.ServiceReserve">
+        update servicereserve set start_date=#{startDate},end_date=#{endDate},price=#{price},application_time=#{applicationTime},status=#{status},
+                                  reserve_option=#{reserveOption},review=#{review},service_id=#{serviceId},patient_id=#{patientId},nurse_id=#{nurseId}
+        where id=#{id}
+    </update>
+</mapper>

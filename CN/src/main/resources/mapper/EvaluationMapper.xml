@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.EvaluationMapper">
+
+    <select id="selectAll" resultType="com.example.entity.Evaluation">
+        select evaluation.* , patient.name AS patientName , nurse.name AS nurseName
+        FROM evaluation
+        LEFT JOIN patient ON evaluation.patient_id = patient.id
+        LEFT JOIN nurse ON evaluation.nurse_id = nurse.id
+        <include refid="com.example.mapper.CommonSql.filterByNameAndUsers"/>
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.Evaluation" useGeneratedKeys="true">
+        insert into evaluation(id,rating,comment,evaluation_time,patient_id,nurse_id)
+        values (#{id},#{rating},#{comment},#{evaluationTime},#{patientId},#{nurseId})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Evaluation">
+        update evaluation set rating=#{rating},comment=#{comment},evaluation_time=#{evaluationTime},patient_id=#{patientId},nurse_id=#{nurseId}
+        where id=#{id}
+    </update>
+</mapper>
