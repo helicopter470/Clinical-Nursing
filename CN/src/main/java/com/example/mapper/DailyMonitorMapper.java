@@ -15,14 +15,14 @@ public interface DailyMonitorMapper {
     int insert(DailyMonitor dailyMonitor);
 
     //删除
-    @Delete("delete from dailyMonitor where id=#{id}")
+    @Delete("delete from dailymonitor where id=#{id}")
     int deleteById(Integer id);
 
     //更新
     int updateById(DailyMonitor dailyMonitor);
 
     //根据id查询
-    @Select("select * from dailyMonitor where id=#{id}")
+    @Select("select * from dailymonitor where id=#{id}")
     DailyMonitor selectById(Integer id);
 
     //查询所有

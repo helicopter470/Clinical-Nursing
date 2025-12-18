@@ -16,14 +16,14 @@ public interface NurseReserveMapper {
     int insert(NurseReserve nurseReserve);
 
     //删除
-    @Delete("delete from nurseReserve where id=#{id}")
+    @Delete("delete from nursereserve where id=#{id}")
     int deleteById(Integer id);
 
     //更新
     int updateById(NurseReserve nurseReserve);
 
     //根据id查询
-    @Select("select * from nurseReserve where id=#{id}")
+    @Select("select * from nursereserve where id=#{id}")
     NurseReserve selectById(Integer id);
 
     //查询所有
@@ -36,6 +36,6 @@ public interface NurseReserveMapper {
     List<Patient> selectPatientsByNurseInService(@Param("nurseId") Integer nurseId);
 
     // 按患者 id 查询该患者的所有护工预约记录
-    @Select("select * from nurseReserve where patient_id = #{patientId}")
+    @Select("select * from nursereserve where patient_id = #{patientId}")
     List<NurseReserve> selectByPatientId(Integer patientId);
 }

@@ -84,7 +84,7 @@ import { onMounted, reactive, ref } from 'vue';
 import request from '@/utils/request'
 
 //文件上传的接口地址
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
+const uploadUrl = import.meta.env.VITE_APP_BASE_URL + '/files/upload'
 
 const data = reactive({
     formVisible: false,

@@ -60,7 +60,7 @@ import { ElMessage } from "element-plus";
 import { useUserStore } from '@/stores/useUserStore'
 
 //文件上传的接口地址
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
+const uploadUrl = import.meta.env.VITE_APP_BASE_URL + '/files/upload'
 const userStore = useUserStore();
 const data = reactive({
     user: { ...userStore.userInfo }

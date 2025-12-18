@@ -15,14 +15,14 @@ public interface ServiceReserveMapper {
     int insert(ServiceReserve serviceReserve);
 
     //删除
-    @Delete("delete from serviceReserve where id=#{id}")
+    @Delete("delete from servicereserve where id=#{id}")
     int deleteById(Integer id);
 
     //更新
     int updateById(ServiceReserve serviceReserve);
 
     //根据id查询
-    @Select("select * from serviceReserve where id=#{id}")
+    @Select("select * from servicereserve where id=#{id}")
     ServiceReserve selectById(Integer id);
 
     //查询所有

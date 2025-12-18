@@ -30,12 +30,14 @@
                 <el-table-column label="联系电话" prop="patientPhone" show-overflow-tooltip />
                 <el-table-column label="紧急联系人" prop="emergencyContact" show-overflow-tooltip />
                 <el-table-column label="紧急联系电话" prop="emergencyPhone" show-overflow-tooltip />
-                <el-table-column label="操作" min-width="120" fixed="right" v-if="data.user.role === 'ADMIN'">
+                <el-table-column label="操作" min-width="120" fixed="right" v-if="data.user.role !== 'NURSE'">
                     <template #default="scope">
-                        <el-button type="primary" :icon="Edit" @click="handleUpdate(scope.row)" circle
-                            plain></el-button>
-                        <el-button type="danger" :icon="Delete" @click="handleDelete(scope.row.id)" circle
-                            plain></el-button>
+                        <el-button type="primary" :icon="Edit" @click="handleUpdate(scope.row)" circle plain
+                            v-if="data.user.role === 'ADMIN'"></el-button>
+                        <el-button type="danger" :icon="Delete" @click="handleDelete(scope.row.id)" circle plain
+                            v-if="data.user.role === 'ADMIN'"></el-button>
+                        <el-button type="primary" @click="handleUpdate(scope.row)" plain size="small"
+                            v-if="data.user.role === 'PATIENT'">补充信息</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -49,13 +51,13 @@
         <el-dialog title="护工信息" v-model="data.formVisible" destory-on-close width="750">
             <el-form ref="formRef" :rules="data.rules" :model="data.form" label-width="80px"
                 style="margin-left: 40px;padding-top: 20px;">
-                <el-form-item label="患者名称" prop="patientName">
+                <el-form-item label="患者名称" prop="patientId">
                     <el-select v-model="data.form.patientId" placeholder="请选择患者" @change="getPatientPhone">
                         <el-option v-for="item in patientList" :key="item.id" :label="item.name"
                             :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="房间名称" prop="wardName">
+                <el-form-item label="房间名称" prop="wardId">
                     <el-select v-model="data.form.wardId" placeholder="请选择房间">
                         <el-option v-for="item in wardList" :key="item.id" :label="item.name"
                             :value="item.id"></el-option>
@@ -132,10 +134,10 @@ const data = reactive({
     user: { ...userStore.userInfo },
     rules: {
         // 表单校验规则示例（在data.rules中添加）
-        patientName: [
+        patientId: [
             { required: true, message: "请选择患者名称", trigger: 'change' }
         ],
-        wardName: [
+        wardId: [
             { required: true, message: "请选择房间名称", trigger: 'change' }
         ],
         bedNum: [

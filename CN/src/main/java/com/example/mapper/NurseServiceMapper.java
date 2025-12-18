@@ -14,19 +14,19 @@ public interface NurseServiceMapper {
     int insert(NurseService nurseService);
 
     //删除
-    @Delete("delete from nurseService where id=#{id}")
+    @Delete("delete from nurseservice where id=#{id}")
     int deleteById(Integer id);
 
     //更新
     int updateById(NurseService nurseService);
 
     //根据id查询
-    @Select("select * from nurseService where id=#{id}")
+    @Select("select * from nurseservice where id=#{id}")
     NurseService selectById(Integer id);
 
     //查询所有
     List<NurseService> selectAll(NurseService nurseService);
 
-    @Select("select * from nurseService where username=#{username}")
+    @Select("select * from nurseservice where username=#{username}")
     NurseService selectByUsername(String username);
 }

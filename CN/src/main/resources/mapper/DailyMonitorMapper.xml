@@ -15,7 +15,7 @@
     </select>
 
     <insert id="insert" parameterType="com.example.entity.DailyMonitor" useGeneratedKeys="true">
-        insert into dailymonitor(id,blood,temp,pluse,breathe,mental,dietary,record,remark,patient_id,nurse_id,ward_id,bed_id)
+        insert into dailymonitor(id,blood,temp,pulse,breathe,mental,dietary,record,remark,patient_id,nurse_id,ward_id,bed_id)
         values (#{id},#{blood},#{temp},#{pulse},#{breathe},#{mental},#{dietary},#{record},#{remark},#{patientId},#{nurseId},#{wardId},#{bedId})
     </insert>
 

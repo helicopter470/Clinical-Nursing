@@ -97,7 +97,7 @@ import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '@/utils/request';
 
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
+const uploadUrl = import.meta.env.VITE_APP_BASE_URL + '/files/upload'
 
 const pageStore = usePageStore()
 

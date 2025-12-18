@@ -15,15 +15,15 @@
 
     <insert id="insert" parameterType="com.example.entity.Patient" useGeneratedKeys="true">
         insert into patient(id,username,password,avatar,name,phone,
-                            sex,age,idcard,address,money,role,nurse_id)
+                            sex,age,idcard,address,role,nurse_id)
         values (#{id},#{username},#{password},#{avatar},#{name},#{phone},
-               #{sex},#{age},#{idcard},#{address},#{money},#{role},#{nurseId})
+               #{sex},#{age},#{idcard},#{address},#{role},#{nurseId})
     </insert>
 
     <update id="updateById" parameterType="com.example.entity.Patient">
         update patient set username=#{username},password=#{password},avatar=#{avatar},
                            name=#{name},phone=#{phone},sex=#{sex},age=#{age},
-                           idcard=#{idcard},address=#{address},money=#{money},role=#{role},
+                           idcard=#{idcard},address=#{address},role=#{role},
                            nurse_id=#{nurseId}
         where id=#{id}
     </update>

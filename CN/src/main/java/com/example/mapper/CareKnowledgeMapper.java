@@ -15,20 +15,20 @@ public interface CareKnowledgeMapper {
     int insert(CareKnowledge careKnowledge);
 
     //删除
-    @Delete("delete from careKnowledge where id=#{id}")
+    @Delete("delete from careknowledge where id=#{id}")
     int deleteById(Integer id);
 
     //更新
     int updateById(CareKnowledge careKnowledge);
 
     //根据id查询
-    @Select("select * from careKnowledge where id=#{id}")
+    @Select("select * from careknowledge where id=#{id}")
     CareKnowledge selectById(Integer id);
 
     //查询所有
     List<CareKnowledge> selectAll(CareKnowledge careKnowledge);
 
     // 增加阅读量（原子更新）
-    @Update("update careKnowledge set click_num = click_num + 1 where id = #{id}")
+    @Update("update careknowledge set click_num = click_num + 1 where id = #{id}")
     int incrementClick(Integer id);
 }

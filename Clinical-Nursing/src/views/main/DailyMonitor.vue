@@ -62,8 +62,9 @@
         <el-dialog title="护理服务信息" v-model="data.formVisible" width="750" destroy-on-close>
             <el-form ref="formRef" :rules="data.rules" :model="data.form" label-width="120px"
                 style="margin-right: 40px;padding-top: 20px;">
-                <el-form-item label="患者" prop="patientName">
-                    <el-select v-model="data.form.patientId" placeholder="请选择患者" filterable clearable>
+                <el-form-item label="患者" prop="patientId">
+                    <el-select v-model="data.form.patientId" placeholder="请选择患者" filterable clearable
+                        @change="onPatientChange">
                         <el-option v-for="item in patientList" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
                 </el-form-item>
@@ -71,13 +72,13 @@
                     <el-input v-model="data.form.blood" autocomplete="off" placeholder="血压(mmHg)" />
                 </el-form-item>
                 <el-form-item label="体温(℃)" prop="temp">
-                    <el-input-number v-model="data.user.temp" :min="1" :max="100" placeholder="体温" />
+                    <el-input-number v-model="data.form.temp" :min="1" :max="100" placeholder="体温" />
                 </el-form-item>
                 <el-form-item label="脉搏(次/分钟)" prop="pulse">
-                    <el-input-number v-model="data.user.pulse" :min="1" :max="100" placeholder="脉搏" />
+                    <el-input-number v-model="data.form.pulse" :min="1" :max="100" placeholder="脉搏" />
                 </el-form-item>
                 <el-form-item label="呼吸(次/分钟)" prop="breathe">
-                    <el-input-number v-model="data.user.pulse" :min="1" :max="100" placeholder="呼吸" />
+                    <el-input-number v-model="data.form.breathe" :min="1" :max="100" placeholder="呼吸" />
                 </el-form-item>
                 <el-form-item label="精神状态" prop="mental">
                     <el-select v-model="data.form.mental" placeholder="请选择精神状态">
@@ -87,13 +88,17 @@
                         <el-option value="很差">很差</el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="饮食状态" prop="distary">
-                    <el-select v-model="data.form.distary" placeholder="请选择饮食状态">
+                <el-form-item label="饮食状态" prop="dietary">
+                    <el-select v-model="data.form.dietary" placeholder="请选择饮食状态">
                         <el-option value="正常">正常</el-option>
                         <el-option value="良好">良好</el-option>
                         <el-option value="较差">较差</el-option>
                         <el-option value="很差">很差</el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="记录日期" prop="record">
+                    <el-date-picker v-model="data.form.record" type="date" placeholder="请选择记录日期"
+                        value-format="YYYY-MM-DD" style="width: 100%;" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="data.form.remark" autocomplete="off" placeholder="请输入介绍" :row="2"
@@ -132,7 +137,7 @@ const data = reactive({
     ids: [],
     user: { ...userStore.userInfo },
     rules: {
-        patientName: [
+        patientId: [
             { required: true, message: "请选择患者", trigger: 'change' }
         ],
         blood: [
@@ -150,8 +155,11 @@ const data = reactive({
         mental: [
             { required: true, message: "请选择精神状态", trigger: 'change' }
         ],
-        distary: [
+        dietary: [
             { required: true, message: "请选择饮食状态", trigger: 'change' }
+        ],
+        record: [
+            { required: true, message: "请选择记录日期", trigger: 'change' }
         ],
         remark: [
             { required: false },
@@ -191,6 +199,7 @@ const save = () => {
 }
 
 const add = () => {
+    data.form.nurseId = data.form.nurseId || userStore.userInfo?.id
     request.post('/dailyMonitor/add', data.form).then(res => {
         if (res.code === '200') {
             data.formVisible = false
@@ -271,6 +280,25 @@ const getPatientsInService = (nurseId) => {
             patientList.value = []
         }
     }).catch(() => { patientList.value = [] })
+}
+
+const onPatientChange = (patientId) => {
+    if (!patientId) {
+        data.form.wardId = null
+        data.form.bedId = null
+        return
+    }
+    // 调整为你后端实际接口
+    request.get('/hp/selectByPatientId/' + patientId).then(res => {
+        const hp = Array.isArray(res.data) ? res.data[0] : res.data
+        if (res && res.code === '200' && hp) {
+            data.form.bedId = hp.id ?? hp.bedId
+            data.form.wardId = hp.ward_id ?? hp.wardId
+        }
+    }).catch(() => {
+        data.form.bedId = null
+        data.form.wardId = null
+    })
 }
 
 // 组件挂载时加载初始数据

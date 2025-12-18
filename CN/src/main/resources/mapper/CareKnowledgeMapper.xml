@@ -5,19 +5,19 @@
 <mapper namespace="com.example.mapper.CareKnowledgeMapper">
 
     <select id="selectAll" resultType="com.example.entity.CareKnowledge">
-        select * from careKnowledge
+        select * from careknowledge
         <where>
             <if test="title!=null">and title like concat('%',#{title},'%')</if>
         </where>
     </select>
 
     <insert id="insert" parameterType="com.example.entity.CareKnowledge" useGeneratedKeys="true">
-        insert into careKnowledge(id,picture,title,introduction,content,time,click_num)
+        insert into careknowledge(id,picture,title,introduction,content,time,click_num)
         values (#{id},#{picture},#{title},#{introduction},#{content},#{time},#{clickNum})
     </insert>
 
     <update id="updateById" parameterType="com.example.entity.CareKnowledge">
-        update careKnowledge set picture=#{picture},title=#{title},introduction=#{introduction},content=#{content},time=#{time},click_num=#{clickNum}
+        update careknowledge set picture=#{picture},title=#{title},introduction=#{introduction},content=#{content},time=#{time},click_num=#{clickNum}
         where id=#{id}
     </update>
 </mapper>

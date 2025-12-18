@@ -12,12 +12,12 @@
     </select>
 
     <insert id="insert" parameterType="com.example.entity.Ward" useGeneratedKeys="true">
-        insert into ward(id,name,level,position,ward_name)
-        values (#{id},#{name},#{level},#{position},#{wardName})
+        insert into ward(id,name,level,position)
+        values (#{id},#{name},#{level},#{position})
     </insert>
 
     <update id="updateById" parameterType="com.example.entity.Ward">
-        update ward set name=#{name},level=#{level},position=#{position},ward_name=#{wardName}
+        update ward set name=#{name},level=#{level},position=#{position}
         where id=#{id}
     </update>
 </mapper>

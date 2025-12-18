@@ -1,10 +1,12 @@
 server:
   port: 9090
+#  port: 5018
 
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
+#    username: xm-cn
     password: 123456
     url: jdbc:mysql://localhost:3306/xm-cn?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
 
@@ -19,4 +21,5 @@ mybatis:
     #驼峰命名法，将数据库中department_id转化成java中的departmentId
 
 # 文件上传的前缀url
+#fileBaseUrl: http://106.55.55.56:5018
 fileBaseUrl: http://localhost:9090
