@@ -32,10 +32,10 @@
                 <el-table-column label="紧急联系电话" prop="emergencyPhone" show-overflow-tooltip />
                 <el-table-column label="操作" min-width="120" fixed="right" v-if="data.user.role !== 'NURSE'">
                     <template #default="scope">
-                        <el-button type="primary" :icon="Edit" @click="handleUpdate(scope.row)" circle plain
-                            v-if="data.user.role === 'ADMIN'"></el-button>
-                        <el-button type="danger" :icon="Delete" @click="handleDelete(scope.row.id)" circle plain
-                            v-if="data.user.role === 'ADMIN'"></el-button>
+                        <el-button type="primary" @click="handleUpdate(scope.row)" size="small" plain
+                            v-if="data.user.role === 'ADMIN'">编辑</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row.id)" size="small" plain
+                            v-if="data.user.role === 'ADMIN'">删除</el-button>
                         <el-button type="primary" @click="handleUpdate(scope.row)" plain size="small"
                             v-if="data.user.role === 'PATIENT'">补充信息</el-button>
                     </template>
@@ -115,7 +115,6 @@
 
 import { usePageStore } from '@/stores/usePageStore'
 import { onMounted, reactive, ref, computed } from 'vue';
-import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useUserStore } from '@/stores/useUserStore';
 import request from '@/utils/request';

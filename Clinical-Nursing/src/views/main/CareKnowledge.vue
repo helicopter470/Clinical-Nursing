@@ -31,10 +31,10 @@
                 <el-table-column label="发布时间" prop="time" />
                 <el-table-column label="操作" min-width="120" fixed="right">
                     <template #default="scope">
-                        <el-button type="primary" :icon="Edit" circle @click="handleUpdate(scope.row)"
-                            plain></el-button>
-                        <el-button type="danger" :icon="Delete" circle @click="handleDelete(scope.row.id)"
-                            plain></el-button>
+                        <el-button type="primary" @click="handleUpdate(scope.row)" size="small"
+                            plain>编辑</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row.id)" size="small"
+                            plain>删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -88,7 +88,6 @@
 <script setup>
 
 import { usePageStore } from '@/stores/usePageStore'
-import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import request from '@/utils/request'

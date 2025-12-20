@@ -180,8 +180,6 @@ const reserve = async (nurse) => {
     }
     try {
         const res = await request.get(`/hp/selectByPatientId/${patientId}`);
-        console.log('/hp response', res);
-
         const raw = res?.data;
         // 兼容后端返回数组或单个对象
         let hpRecord = null;

@@ -32,10 +32,10 @@
                 <el-table-column label="家庭住址" prop="address" show-overflow-tooltip/>
                 <el-table-column label="操作" min-width="120" fixed="right">
                     <template #default="scope">
-                        <el-button type="primary" :icon="Edit" @click="handleUpdate(scope.row)" circle
-                            plain></el-button>
-                        <el-button type="danger" :icon="Delete" @click="handleDelete(scope.row.id)" circle
-                            plain></el-button>
+                        <el-button type="primary" @click="handleUpdate(scope.row)" size="small"
+                            plain>编辑</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row.id)" size="small"
+                            plain>删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -102,7 +102,6 @@
 
 import { usePageStore } from '@/stores/usePageStore'
 import { onMounted, reactive, ref } from 'vue';
-import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '@/utils/request';
 

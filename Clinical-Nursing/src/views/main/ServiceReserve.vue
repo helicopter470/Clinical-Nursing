@@ -41,13 +41,16 @@
                             @click="handleReject(scope.row)">拒绝</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" min-width="120" fixed="right">
+                <el-table-column label="操作" min-width="140" fixed="right">
                     <template #default="scope">
                         <el-button type="primary" size="small" plain
                             v-if="data.user.role === 'PATIENT' && scope.row.status === '待审核'"
-                            @click="cancle(scope.row)">取消</el-button>
-                        <el-button type="danger" :icon="Delete" @click="handleDelete(scope.row.id)" circle plain
-                            v-if="data.user.role === 'ADMIN'"></el-button>
+                            @click="cancle(scope.row)">取消服务</el-button>
+                        <el-button type="primary" size="small" plain
+                            v-if="data.user.role === 'ADMIN' && scope.row.status === '服务中'"
+                            @click="finish(scope.row)">结束服务</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row.id)" size="small" plain
+                            v-if="data.user.role === 'ADMIN'">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -79,7 +82,6 @@
 
 import { usePageStore } from '@/stores/usePageStore'
 import { onMounted, reactive, ref, computed } from 'vue';
-import { Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useUserStore } from '@/stores/useUserStore';
 import request from '@/utils/request';
@@ -199,6 +201,24 @@ const cancle = (row) => {
             ...row,
             id: row.id,
             status: '已取消'
+        };
+        request.put('/serviceReserve/update', updateData).then(res => {
+            if (res.code === '200') {
+                ElMessage.success('取消成功');
+                pageStore.loadData();
+            } else {
+                ElMessage.error(res.msg);
+            }
+        })
+    }).catch();
+}
+
+const finish = (row) => {
+    ElMessageBox.confirm('确认结束该服务预约吗？', '操作确认', { type: 'warning' }).then(() => {
+        const updateData = {
+            ...row,
+            id: row.id,
+            status: '已结束'
         };
         request.put('/serviceReserve/update', updateData).then(res => {
             if (res.code === '200') {

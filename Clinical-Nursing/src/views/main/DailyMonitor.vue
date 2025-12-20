@@ -45,10 +45,10 @@
                 <el-table-column label="备注" prop="remark" />
                 <el-table-column label="操作" min-width="120" fixed="right" v-if="data.user.role !== 'PATIENT'">
                     <template #default="scope">
-                        <el-button type="primary" :icon="Edit" circle @click="handleUpdate(scope.row)" plain
-                            v-if="data.user.role === 'NURSE'"></el-button>
-                        <el-button type="danger" :icon="Delete" circle @click="handleDelete(scope.row.id)"
-                            plain></el-button>
+                        <el-button type="primary" @click="handleUpdate(scope.row)" size="small" plain
+                            v-if="data.user.role === 'NURSE'">编辑</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row.id)" size="small" plain
+                            v-if="data.user.role === 'ADMIN'">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -120,7 +120,6 @@
 <script setup>
 
 import { usePageStore } from '@/stores/usePageStore'
-import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, reactive, ref, computed } from 'vue';
 import { useUserStore } from '@/stores/useUserStore';

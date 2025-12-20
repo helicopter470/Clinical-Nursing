@@ -25,8 +25,8 @@
                 <el-table-column label="评价时间" prop="evaluationTime" />
                 <el-table-column label="操作" min-width="120" fixed="right" v-if="data.user.role !== 'NURSE'">
                     <template #default="scope">
-                        <el-button type="danger" :icon="Delete" @click="handleDelete(scope.row.id)" circle
-                            plain></el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row.id)" size="small"
+                            plain>删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -44,7 +44,6 @@
 
 import { usePageStore } from '@/stores/usePageStore'
 import { onMounted, reactive, ref, computed } from 'vue';
-import { Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useUserStore } from '@/stores/useUserStore';
 import request from '@/utils/request';

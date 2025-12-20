@@ -42,8 +42,11 @@
                         <el-button type="primary" size="small" plain
                             v-if="data.user.role === 'PATIENT' && scope.row.status === '已结束'"
                             @click="evaluation(scope.row)">评价</el-button>
-                        <el-button type="danger" :icon="Delete" @click="handleDelete(scope.row.id)" circle plain
-                            v-if="data.user.role === 'ADMIN'"></el-button>
+                        <el-button type="primary" size="small" plain
+                            v-if="data.user.role === 'NURSE' && scope.row.status === '服务中'"
+                            @click="finish(scope.row)">结束服务</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row.id)" size="small" plain
+                            v-if="data.user.role === 'ADMIN'">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -93,7 +96,6 @@
 
 import { usePageStore } from '@/stores/usePageStore'
 import { onMounted, reactive, ref, computed } from 'vue';
-import { Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useUserStore } from '@/stores/useUserStore';
 import request from '@/utils/request';
@@ -210,9 +212,10 @@ const evaluation = (row) => {
         rating: 0,
         comment: ''
     },
-    data.formVisible = true
+        data.formVisible = true
 
 }
+
 const save = () => {
     request.post('/evaluation/add', data.form).then(res => {
         if (res.code === '200') {
@@ -222,6 +225,44 @@ const save = () => {
         } else {
             ElMessage.error(res.msg)
         }
+    })
+}
+
+const finish = async (row) => {
+    try {
+        const res=await request.get(`/serviceReserve/selectByPatientId/${row.patientId}`)
+        if (!res || res.code !== '200') {
+            ElMessage.error('检查服务状态失败，请稍后重试')
+            return
+        }
+
+        // 兼容返回对象或数组，统一成数组来判断
+        const list = Array.isArray(res.data) ? res.data : (res.data ? [res.data] : [])
+        const hasServiceing = list.some(item => item && item.status === '服务中')
+
+        if (hasServiceing) {
+            ElMessage.warning('该患者当前护理服务状态为 “服务中”，无法结束护工预约')
+            return
+        }
+    } catch (err) {
+        ElMessage.error('检查服务状态失败，请稍后重试')
+        return
+    }
+
+    ElMessageBox.confirm('确定结束该护工预约吗?', '操作确认', { type: 'warning' }).then(() => {
+        const updateData = {
+            ...row,
+            id: row.id,
+            status: '已结束'
+        }
+        request.put('/nurseReserve/update', updateData).then(res => {
+            if (res.code === '200') {
+                ElMessage.success('操作成功');
+                pageStore.loadData();
+            } else {
+                ElMessage.error(res.msg);
+            }
+        })
     })
 }
 
