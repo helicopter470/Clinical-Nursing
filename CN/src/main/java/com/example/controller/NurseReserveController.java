@@ -4,10 +4,10 @@ import com.example.common.Result;
 import com.example.entity.NurseReserve;
 import com.example.entity.PageQuery;
 import com.example.entity.Patient;
-import com.example.entity.ServiceReserve;
 import com.example.service.NurseReserveService;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +19,9 @@ public class NurseReserveController {
 
     @Resource
     private NurseReserveService nurseReserveService;
-    private Result success;
-
     //新增
     @PostMapping("/add")
-    public Result add(@RequestBody NurseReserve nurseReserve) {
+    public Result add(@Valid @RequestBody NurseReserve nurseReserve) {
         nurseReserveService.add(nurseReserve);
         return Result.success();
     }

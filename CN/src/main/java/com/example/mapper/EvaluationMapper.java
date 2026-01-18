@@ -31,4 +31,9 @@ public interface EvaluationMapper {
                                @Param("patientId") Integer patientId,
                                @Param("nurseId") Integer nurseId,
                                @Param("record") String record);
+    @Select("select count(1) from nurse where id = #{nurseId}")
+    int existsNurseById(@Param("nurseId") Integer nurseId);
+
+    @Select("select count(1) from patient where id = #{patientId}")
+    int existsPatientById(@Param("patientId") Integer patientId);
 }

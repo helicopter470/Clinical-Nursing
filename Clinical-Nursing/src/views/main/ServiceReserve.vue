@@ -139,6 +139,7 @@ const handlePass = (row) => {
         })
     }).catch();
 }
+
 const handleReject = (row) => {
     data.form = { ...row }
     data.reviewVisible = true
@@ -162,7 +163,6 @@ const reviewSave = () => {
         })
     }).catch()
 }
-
 
 const handleSelectionChange = (rows) => {
     data.ids = rows.map(row => row.id)

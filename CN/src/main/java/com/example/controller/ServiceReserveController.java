@@ -2,11 +2,11 @@ package com.example.controller;
 
 import com.example.common.Result;
 import com.example.entity.PageQuery;
-import com.example.entity.Patient;
 import com.example.entity.ServiceReserve;
 import com.example.service.ServiceReserveService;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +18,10 @@ public class ServiceReserveController {
 
     @Resource
     private ServiceReserveService serviceReserveService;
-    private Result success;
 
     //新增
     @PostMapping("/add")
-    public Result add(@RequestBody ServiceReserve serviceReserve) {
+    public Result add(@Valid @RequestBody ServiceReserve serviceReserve) {
         serviceReserveService.add(serviceReserve);
         return Result.success();
     }

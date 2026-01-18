@@ -38,4 +38,10 @@ public interface NurseReserveMapper {
     // 按患者 id 查询该患者的所有护工预约记录
     @Select("select * from nursereserve where patient_id = #{patientId}")
     List<NurseReserve> selectByPatientId(Integer patientId);
+
+    @Select("select count(1) from nurse where id = #{nurseId}")
+    int existsNurseById(@Param("nurseId") Integer nurseId);
+
+    @Select("select count(1) from patient where id = #{patientId}")
+    int existsPatientById(@Param("patientId") Integer patientId);
 }

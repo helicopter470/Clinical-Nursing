@@ -5,6 +5,7 @@ import com.example.entity.NurseReserve;
 import com.example.entity.PageQuery;
 import com.example.entity.Patient;
 import com.example.entity.ServiceReserve;
+import com.example.exception.CustomException;
 import com.example.mapper.NurseReserveMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -21,6 +22,17 @@ public class NurseReserveService {
 
     //新增
     public void add(NurseReserve nurseReserve){
+        Integer nurseId = nurseReserve.getNurseId();
+        Integer patientId = nurseReserve.getPatientId();
+
+        // @NotNull 会先拦截 null，这里主要拦截“不存在”
+        if (nurseReserveMapper.existsNurseById(nurseId) <= 0) {
+            throw new CustomException("护工不存在(nurseId=" + nurseId + ")");
+        }
+        if (nurseReserveMapper.existsPatientById(patientId) <= 0) {
+            throw new CustomException("患者不存在(patientId=" + patientId + ")");
+        }
+
         nurseReserve.setApplicationTime(DateUtil.now());
         nurseReserveMapper.insert(nurseReserve);
     }

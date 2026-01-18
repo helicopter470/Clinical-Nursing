@@ -3,6 +3,7 @@ package com.example.service;
 import cn.hutool.core.date.DateUtil;
 import com.example.entity.PageQuery;
 import com.example.entity.ServiceReserve;
+import com.example.exception.CustomException;
 import com.example.mapper.ServiceReserveMapper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -18,6 +19,20 @@ public class ServiceReserveService {
 
     //新增
     public void add(ServiceReserve serviceReserve){
+        Integer serviceId = serviceReserve.getServiceId();
+        Integer nurseId = serviceReserve.getNurseId();
+        Integer patientId = serviceReserve.getPatientId();
+        // @NotNull 会先拦截 null，这里主要拦截“不存在”
+        if (serviceReserveMapper.existsServiceById(serviceId) <= 0) {
+            throw new CustomException("服务不存在(serviceId=" + serviceId + ")");
+        }
+        if (serviceReserveMapper.existsNurseById(nurseId) <= 0) {
+            throw new CustomException("护工不存在(nurseId=" + nurseId + ")");
+        }
+        if (serviceReserveMapper.existsPatientById(patientId) <= 0) {
+            throw new CustomException("患者不存在(patientId=" + patientId + ")");
+        }
+
         serviceReserve.setApplicationTime(DateUtil.now());
         serviceReserveMapper.insert(serviceReserve);
     }
@@ -45,7 +60,7 @@ public class ServiceReserveService {
         return serviceReserveMapper.selectAll(pageQuery.getName(), pageQuery.getNurseName(), pageQuery.getPatientId(), pageQuery.getNurseId(),pageQuery.getRecord());
     }
 
-    // 通用分页接口：注意不要把 pageNum/pageSize 传入 mapper，分页由 PageHelper 控制
+    // 通用分页接口，分页由 PageHelper 控制
     public PageInfo<ServiceReserve> selectPage(PageQuery pageQuery) {
         return BasePageService.pageQuery(() ->
                         // 仅传 name / patientId / nurseId 给 mapper

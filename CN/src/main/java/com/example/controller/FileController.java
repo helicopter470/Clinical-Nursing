@@ -41,24 +41,4 @@ public class FileController {
         String url=fileBaseUrl+"/files/download/"+fileName;
         return Result.success(url);
     }
-
-    //文件下载
-    @GetMapping("/download/{fileName}")
-    public void download(@PathVariable String fileName, HttpServletResponse response) {
-        //设置下载文件http响应头
-        response.setHeader("Content-Disposition","attachment;filename="+ URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-        //拼接完整的文件储存路径
-        String realFilePath = filePath + fileName;
-        try {
-            // 通过文件的存储路径拿到文件字节数组
-            byte[] bytes = FileUtil.readBytes(realFilePath);
-            ServletOutputStream os = response.getOutputStream();
-            // 将文件字节数组写出到文件流
-            os.write(bytes);
-            os.flush();
-            os.close();
-        } catch (IOException e) {
-            System.out.println("文件下载错误");
-        }
-    }
 }

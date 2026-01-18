@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.example.entity.Evaluation;
 import com.example.entity.PageQuery;
 import com.example.entity.ServiceReserve;
+import com.example.exception.CustomException;
 import com.example.mapper.EvaluationMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -20,6 +21,16 @@ public class EvaluationService {
 
     //新增
     public void add(Evaluation evaluation){
+        Integer nurseId = evaluation.getNurseId();
+        Integer patientId = evaluation.getPatientId();
+
+        // @NotNull 会先拦截 null，这里主要拦截“不存在”
+        if (evaluationMapper.existsNurseById(nurseId) <= 0) {
+            throw new CustomException("护工不存在(nurseId=" + nurseId + ")");
+        }
+        if (evaluationMapper.existsPatientById(patientId) <= 0) {
+            throw new CustomException("患者不存在(patientId=" + patientId + ")");
+        }
         evaluation.setEvaluationTime(DateUtil.now());
         evaluationMapper.insert(evaluation);
     }

@@ -143,7 +143,7 @@ const viewEval = async (nurse) => {
                     const pr = await request.get(`/patient/selectById/${id}`);
                     const pd = pr.data
                     const avatarFromPatient = pd.avatar
-                    // 7. 若获取到头像，更新到对应的评价数据中
+                    // 若获取到头像，更新到对应的评价数据中
                     if (avatarFromPatient) {
                         mapped.forEach(m => {
                             if (String(m.patient_id) === String(id) && !m.avatar) {
@@ -257,7 +257,6 @@ const saveReserve = () => {
                 return;
             }
         }
-
         // 转换数值字段并补充 status（以防用户被篡改）
         data.form.patient_id = Number(data.form.patient_id);
         data.form.nurse_id = Number(data.form.nurse_id);

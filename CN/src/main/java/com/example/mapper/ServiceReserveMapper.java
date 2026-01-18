@@ -35,4 +35,13 @@ public interface ServiceReserveMapper {
     //用于校验查询
     @Select("select * from servicereserve where patient_id = #{patientId}")
     List<ServiceReserve> selectByPatientId(Integer patientId);
+
+    @Select("select count(1) from nurse where id = #{nurseId}")
+    int existsNurseById(@Param("nurseId") Integer nurseId);
+
+    @Select("select count(1) from patient where id = #{patientId}")
+    int existsPatientById(@Param("patientId") Integer patientId);
+
+    @Select("select count(1) from nurseservice where id = #{serviceId}")
+    int existsServiceById(@Param("serviceId") Integer serviceId);
 }

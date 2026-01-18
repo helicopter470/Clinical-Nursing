@@ -1,11 +1,19 @@
 package com.example.entity;
 
+import jakarta.validation.constraints.NotNull;
+
 public class Evaluation {
     private Integer id;
+
+    @NotNull(message = "rating不能为空")
     private Double rating;
     private String comment;
     private String evaluationTime;
+
+    @NotNull(message = "patientId不能为空")
     private Integer patientId;
+
+    @NotNull(message = "nurseId不能为空")
     private Integer nurseId;
     private String nurseName;
     private String patientName;

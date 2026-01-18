@@ -1,5 +1,7 @@
 package com.example.entity;
 
+import jakarta.validation.constraints.NotNull;
+
 public class ServiceReserve {
     private Integer id;
     private String startDate;
@@ -9,8 +11,14 @@ public class ServiceReserve {
     private String status;
     private String reserveOption;
     private String review;
+
+    @NotNull(message = "serviceId不能为空")
     private Integer serviceId;
+
+    @NotNull(message = "nurseId不能为空")
     private Integer nurseId;
+
+    @NotNull(message = "patientId不能为空")
     private Integer patientId;
     private String serverName;
     private String nurseName;

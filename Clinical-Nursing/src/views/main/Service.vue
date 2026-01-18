@@ -205,11 +205,13 @@ const saveReserve = () => {
         const nurseStartRaw = data.form.nurseReserveStartDate ?? data.form.nurse_reserve_start_date ?? null;
         const nurseEndRaw = data.form.nurseReserveEndDate ?? data.form.nurse_reserve_end_date ?? null;
 
-        const svcStart = new Date(data.form.startDate); svcStart.setHours(0,0,0,0);
+        const svcStart = new Date(data.form.startDate); 
+        svcStart.setHours(0,0,0,0);
 
         // 校验开始不能早于护工开始
         if (nurseStartRaw) {
-            const nurseStart = new Date(nurseStartRaw); nurseStart.setHours(0,0,0,0);
+            const nurseStart = new Date(nurseStartRaw); 
+            nurseStart.setHours(0,0,0,0);
             if (svcStart < nurseStart) {
                 ElMessage.error('服务开始日期不能早于护工预约开始日期');
                 return;
@@ -217,8 +219,10 @@ const saveReserve = () => {
         }
         // 校验结束不能晚于护工结束（仅当护工有结束日期且用户填写了结束日期时）
         if (nurseEndRaw && data.form.endDate) {
-            const nurseEnd = new Date(nurseEndRaw); nurseEnd.setHours(0,0,0,0);
-            const svcEnd = new Date(data.form.endDate); svcEnd.setHours(0,0,0,0);
+            const nurseEnd = new Date(nurseEndRaw); 
+            nurseEnd.setHours(0,0,0,0);
+            const svcEnd = new Date(data.form.endDate); 
+            svcEnd.setHours(0,0,0,0);
             if (svcEnd > nurseEnd) {
                 ElMessage.error('服务结束日期不能晚于护工预约结束日期');
                 return;
