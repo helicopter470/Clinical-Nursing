@@ -12,10 +12,14 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*"); // 1 设置访问源地址
-        corsConfiguration.addAllowedHeader("*"); // 2 设置访问源请求头
-        corsConfiguration.addAllowedMethod("*"); // 3 设置访问源请求方法
-        source.registerCorsConfiguration("/**", corsConfiguration); // 4 对接口配置跨域设置
+        // 使用 allowedOriginPatterns 才能在需要携带 Authorization 等场景下安全地放行所有来源
+        corsConfiguration.addAllowedOriginPattern("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setAllowCredentials(true);
+        // 让浏览器能够读到后端返回的 Authorization（如果你将来做刷新/续期可能用到）
+        corsConfiguration.addExposedHeader("Authorization");
+        source.registerCorsConfiguration("/**", corsConfiguration);
         return new CorsFilter(source);
     }
 }

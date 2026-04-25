@@ -78,6 +78,7 @@ import { usePageStore } from '@/stores/usePageStore';
 import { onMounted, reactive, ref } from 'vue';
 import request from '@/utils/request';
 import { useUserStore } from '@/stores/useUserStore';
+import { ElMessage } from 'element-plus';
 
 const data = reactive({
     evalDialogVisible: false,
@@ -172,62 +173,17 @@ const viewEval = async (nurse) => {
 }
 
 const reserve = async (nurse) => {
-    // 检查登录用户
+    // 仅做登录与必要字段预填；业务校验统一由后端处理
     const patientId = userStore.userInfo?.id;
     if (!patientId) {
         ElMessage.warning('请先登录再预约');
         return;
     }
-    try {
-        const res = await request.get(`/hp/selectByPatientId/${patientId}`);
-        const raw = res?.data;
-        // 兼容后端返回数组或单个对象
-        let hpRecord = null;
-        if (Array.isArray(raw)) {
-            hpRecord = raw.find(item => {
-                const idCandidates = [item.patientId, item.patient_id, item.patientid, item.id];
-                return idCandidates.some(v => String(v ?? '') === String(patientId));
-            }) || null;
-        } else {
-            hpRecord = raw || null;
-        }
-
-        // 兼容不同状态字段名，并做 trim 比较
-        const statusVal = (hpRecord?.status ?? hpRecord?.state ?? '').toString().trim();
-        if (!hpRecord || statusVal !== '住院中') {
-            ElMessage.warning('当前患者非住院状态，无法预约护工');
-            return;
-        }
-
-        // 保存入院日期到表单，供后续校验使用（兼容 admitDate / admit_date）
-        data.form = {
-            nurse_id: nurse?.id,
-            patient_id: Number(patientId),
-            status: '待审核',
-            admitDate: hpRecord?.admitDate || hpRecord?.admit_date || hpRecord?.admit_date_str || null
-        };
-    } catch (e) {
-        ElMessage.error('获取住院信息失败，无法预约护工');
-        return;
-    }
-    try {
-        const rr = await request.get(`/nurseReserve/selectByPatientId/${patientId}`);
-        // console.log('/nurseReserve response', rr);
-        const rawList = rr?.data;
-        // 兼容后端返回数组或单个对象
-        const reserves = Array.isArray(rawList) ? rawList : (rawList ? [rawList] : []);
-        const blocked = reserves.some(item => {
-            const statusVal = String((item?.status ?? item?.state ?? '')).trim();
-            return statusVal === '服务中' || statusVal === '待审核';
-        });
-        if (blocked) {
-            ElMessage.warning('当前患者已有进行中或待审核的护工服务，无法再次预约');
-            return;
-        }
-    } catch (e) {
-        ElMessage.error('无法验证历史预约状态，无法预约');
-        return;
-    }
+    data.form = {
+        nurse_id: nurse?.id,
+        patient_id: Number(patientId),
+        status: '待审核'
+    };
     data.reserveDialogVisible = true;
 }
 
@@ -245,18 +201,6 @@ const saveReserve = () => {
             ElMessage.error('未选择护工，无法预约');
             return;
         }
-        // 验证：预约开始日期不能早于入院日期
-        if (data.form.admitDate && data.form.startDate) {
-            const admit = new Date(data.form.admitDate);
-            const start = new Date(data.form.startDate);
-            // 将时间归零再比较，保证只按日期比较
-            admit.setHours(0,0,0,0);
-            start.setHours(0,0,0,0);
-            if (start < admit) {
-                ElMessage.error('开始日期必须在入院日期之后或当天');
-                return;
-            }
-        }
         // 转换数值字段并补充 status（以防用户被篡改）
         data.form.patient_id = Number(data.form.patient_id);
         data.form.nurse_id = Number(data.form.nurse_id);
@@ -272,11 +216,12 @@ const saveReserve = () => {
                 ElMessage.success('预约已提交，待审核');
                 pageStore.loadData();
             } else {
+                // 后端已强制校验：未住院不可预约护工
                 ElMessage.error(res.msg || '预约提交失败');
             }
         }).catch(e => {
             console.error('预约接口错误', e);
-            ElMessage.error('预约提交失败');
+            ElMessage.error(e?.response?.data?.msg || e?.response?.data?.message || '预约提交失败');
         });
     });
 }

@@ -2,7 +2,6 @@ package com.example.controller;
 
 import com.example.common.Result;
 import com.example.entity.DailyMonitor;
-import com.example.entity.Hp;
 import com.example.entity.PageQuery;
 import com.example.service.DailyMonitorService;
 import com.github.pagehelper.PageInfo;

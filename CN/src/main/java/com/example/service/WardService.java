@@ -1,8 +1,6 @@
 package com.example.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.example.entity.Ward;
-import com.example.exception.CustomException;
 import com.example.mapper.WardMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;

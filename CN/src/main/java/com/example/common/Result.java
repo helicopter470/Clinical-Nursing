@@ -37,6 +37,13 @@ public class Result {
         return result;
     }
 
+    public static Result unauthorized(String msg) {
+        Result result = new Result();
+        result.setCode("401");
+        result.setMsg(msg);
+        return result;
+    }
+
     public String getCode() {
         return code;
     }

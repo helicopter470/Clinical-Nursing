@@ -11,6 +11,14 @@ const request = axios.create({
 // 可以自请求发送前对请求做一些处理
 request.interceptors.request.use(config => {
     config.headers['Content-Type'] = 'application/json;charset=utf-8';
+
+    // 自动带上 token（若存在）
+    try {
+        const user = JSON.parse(localStorage.getItem('system-user') || '{}')
+        const token = user?.token || user?.accessToken || user?.jwt
+        if (token) config.headers['Authorization'] = `Bearer ${token}`
+    } catch (e) { }
+
     return config
 }, error => {
     return Promise.reject(error)

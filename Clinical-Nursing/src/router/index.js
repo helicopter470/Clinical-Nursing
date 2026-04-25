@@ -31,4 +31,20 @@ const router = createRouter({
         { path: '/register', component: () => import('@/views/Register.vue') }
     ]
 })
+
+// 简单登录守卫：没有 token 不允许进入业务页
+router.beforeEach((to, from, next) => {
+    const whiteList = ['/login', '/register']
+    if (whiteList.includes(to.path)) return next()
+
+    let token = ''
+    try {
+        const user = JSON.parse(localStorage.getItem('system-user') || '{}')
+        token = user?.accessToken || user?.token || user?.jwt || ''
+    } catch (e) { }
+
+    if (!token) return next('/login')
+    next()
+})
+
 export default router

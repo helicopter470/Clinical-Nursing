@@ -1,6 +1,7 @@
 <script setup>
 import CommonHeader from '@/components/CommonHeader.vue';
 import CommonAside from '@/components/CommonAside.vue';
+import AiChatDrawer from '@/components/AiChatDrawer.vue';
 </script>
 
 <template>
@@ -18,6 +19,9 @@ import CommonAside from '@/components/CommonAside.vue';
                 </el-main>
             </el-container>
         </el-container>
+
+        <!-- AI 悬浮按钮 + 抽屉（仅主布局展示，登录/注册页不显示） -->
+        <AiChatDrawer />
     </div>
 </template>
 

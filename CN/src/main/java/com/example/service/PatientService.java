@@ -1,6 +1,7 @@
 package com.example.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.example.common.PasswordPolicy;
 import com.example.entity.Account;
 import com.example.entity.Patient;
 import com.example.mapper.PatientMapper;
@@ -9,6 +10,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 @Service
@@ -16,6 +18,9 @@ public class PatientService {
 
     @Resource
     private PatientMapper patientMapper;
+
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     //新增
     public void add(Patient patient) {
@@ -30,6 +35,8 @@ public class PatientService {
             patient.setName(patient.getUsername());
         }
         patient.setRole("PATIENT");
+        // 新增用户时就开始加密存储
+        patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         patientMapper.insert(patient);
     }
 
@@ -73,8 +80,25 @@ public class PatientService {
         if(ObjectUtil.isNull(dbPatient)){
             throw new CustomException("用户不存在");
         }
-        if(!account.getPassword().equals(dbPatient.getPassword())){
+        String raw = account.getPassword();
+        String stored = dbPatient.getPassword();
+        boolean ok;
+        try {
+            ok = stored != null && stored.startsWith("$2") ? passwordEncoder.matches(raw, stored) : raw.equals(stored);
+        } catch (Exception e) {
+            ok = raw.equals(stored);
+        }
+        if (!ok) {
             throw new CustomException("账号或密码错误");
+        }
+        // 存量明文密码：登录成功后可自动升级为 BCrypt
+        if (stored != null && !stored.startsWith("$2")) {
+            Patient p = patientMapper.selectByUsername(account.getUsername());
+            if (p != null) {
+                p.setPassword(passwordEncoder.encode(raw));
+                patientMapper.updateById(p);
+                dbPatient.setPassword(p.getPassword());
+            }
         }
         return dbPatient;
     }
@@ -84,12 +108,35 @@ public class PatientService {
         this.add(patient);
     }
 
+    public void changePassword(Integer userId, String oldPassword, String newPassword) {
+        Patient dbPatient = patientMapper.selectById(userId);
+        if (ObjectUtil.isNull(dbPatient)) {
+            throw new CustomException("用户不存在");
+        }
+        PasswordPolicy.validateNewPassword(newPassword, oldPassword);
+
+        String stored = dbPatient.getPassword();
+        boolean ok;
+        try {
+            ok = stored != null && stored.startsWith("$2") ? passwordEncoder.matches(oldPassword, stored) : oldPassword.equals(stored);
+        } catch (Exception e) {
+            ok = oldPassword.equals(stored);
+        }
+        if (!ok) {
+            throw new CustomException("旧密码不正确");
+        }
+
+        dbPatient.setPassword(passwordEncoder.encode(newPassword));
+        patientMapper.updateById(dbPatient);
+    }
+
     public void updatePassword(Account account){
         Patient dbPatient=patientMapper.selectByUsername(account.getUsername());
         if(ObjectUtil.isNull(dbPatient)){
             throw new CustomException("用户不存在");
         }
-        dbPatient.setPassword(account.getPassword());
+        // 兼容旧接口：直接重置为传入密码（仍改为加密存储）
+        dbPatient.setPassword(passwordEncoder.encode(account.getPassword()));
         patientMapper.updateById(dbPatient);
     }
 }

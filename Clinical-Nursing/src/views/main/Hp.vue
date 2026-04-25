@@ -156,21 +156,10 @@ const data = reactive({
         ],
         admitDate: [{ required: true, message: '请选择入院日期', trigger: 'change' }],
         dischargeDate: [
-            { required: false, message: '请选择出院日期', trigger: 'change' },
-            {
-                validator: (rule, value, callback) => {
-                    if (value && data.form.admitDate) {
-                        if (new Date(value) < new Date(data.form.admitDate)) {
-                            callback(new Error('出院日期不能早于入院日期'));
-                        } else {
-                            callback();
-                        }
-                    } else {
-                        callback();
-                    }
-                },
-                trigger: 'change'
-            }
+            { required: false, message: '请选择出院日期', trigger: 'change' }
+            // 业务校验已迁移到后端：
+            // 1) 出院日期不能早于入院日期
+            // 2) 住院中不允许填写出院日期 / 已出院必须填写出院日期
         ]
     }
 })

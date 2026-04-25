@@ -14,6 +14,12 @@ export const useUserStore = defineStore('user', {
       // 同步更新本地存储（防止刷新丢失）
       localStorage.setItem('system-user', JSON.stringify(this.userInfo));
     },
+
+    // 仅更新头像（兼容旧代码调用）
+    updateAvatar(avatarUrl) {
+      this.updateUserInfo({ avatar: avatarUrl });
+    },
+
     logout() {
       this.userInfo = {};
       localStorage.removeItem('system-user');

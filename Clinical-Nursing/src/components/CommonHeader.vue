@@ -44,7 +44,8 @@ const data = reactive({
     user: JSON.parse(localStorage.getItem('system-user') || '{}')
 })
 
-if (!data.user?.id) {
+// 现在后端用 JWT 鉴权：优先判断 token 是否存在
+if (!data.user?.accessToken && !data.user?.token && !data.user?.jwt) {
     ElMessage.error('请登录！')
     router.push('/login')
 }

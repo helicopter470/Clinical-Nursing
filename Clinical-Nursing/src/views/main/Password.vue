@@ -27,11 +27,13 @@
 
 <script setup>
 import { useUserStore } from "@/stores/useUserStore";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { ElMessage } from "element-plus";
 import request from '@/utils/request';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const router = useRouter();
 const data = reactive({
     user: { ...userStore.userInfo },
     form: {
@@ -41,6 +43,32 @@ const data = reactive({
     }
 });
 
+const passwordStrength = computed(() => {
+    const p = data.form.newPassword || '';
+    let score = 0;
+    if (p.length >= 8) score++;
+    if (/[A-Za-z]/.test(p)) score++;
+    if (/\d/.test(p)) score++;
+    if (/[^A-Za-z\d]/.test(p)) score++;
+    if (p.length >= 12) score++;
+    if (score <= 1) return { label: '弱', type: 'danger' };
+    if (score <= 3) return { label: '中', type: 'warning' };
+    return { label: '强', type: 'success' };
+});
+
+const validateNewPassword = () => {
+    const p = data.form.newPassword || '';
+    if (p.length < 8) {
+        return '新密码长度至少8位';
+    }
+    if (!(/[A-Za-z]/.test(p) && /\d/.test(p))) {
+        return '新密码需同时包含字母和数字';
+    }
+    if (data.form.oldPassword && p === data.form.oldPassword) {
+        return '新密码不能与旧密码相同';
+    }
+    return '';
+}
 
 const save = async () => {
     if (!data.form.newPassword || !data.form.confirmPassword) {
@@ -56,34 +84,41 @@ const save = async () => {
         return;
     }
 
-    try {
-        // 验证旧密码（使用新增的 /verifyPassword）
-        const verifyRes = await request.post('/verifyPassword', {
-            username: data.user.username,
-            password: data.form.oldPassword,
-            role: data.user.role
-        });
-        if (!verifyRes || !(verifyRes.code === '200' || verifyRes.code === 200)) {
-            ElMessage.error(verifyRes?.msg || '旧密码错误，验证失败');
-            return;
-        }
+    const pwdErr = validateNewPassword();
+    if (pwdErr) {
+        ElMessage.warning(pwdErr);
+        return;
+    }
 
-        // 调用后端已有的修改接口（PUT /updatePassword），传 username + new password + role
-        const updateRes = await request.put('/updatePassword', {
-            username: data.user.username,
-            password: data.form.newPassword,
-            role: data.user.role
+    try {
+        const res = await request.put('/changePassword', {
+            userId: Number(data.user.id),
+            role: data.user.role,
+            oldPassword: data.form.oldPassword,
+            newPassword: data.form.newPassword
         });
-        if (updateRes && (updateRes.code === '200' || updateRes.code === 200)) {
-            ElMessage.success('密码修改成功');
+
+        if (res && (res.code === '200' || res.code === 200)) {
+            ElMessage.success(res?.msg || '密码修改成功，请重新登录');
             data.form.oldPassword = '';
             data.form.newPassword = '';
             data.form.confirmPassword = '';
+
+            // 清理登录态：token 已不再可信，强制重新登录
+            try {
+                localStorage.removeItem('system-user');
+            } catch (_) {}
+            userStore.logout && userStore.logout();
+            // 兼容没有 logout 的情况
+            if (!userStore.logout) {
+                userStore.userInfo = null;
+            }
+            router.replace('/login');
         } else {
-            ElMessage.error(updateRes?.msg || '修改密码失败');
+            ElMessage.error(res?.msg || '修改密码失败');
         }
     } catch (err) {
-        ElMessage.error('修改密码失败，详情见控制台');
+        ElMessage.error(err?.response?.data?.msg || err?.response?.data?.message || '修改密码失败');
     }
 }
 </script>

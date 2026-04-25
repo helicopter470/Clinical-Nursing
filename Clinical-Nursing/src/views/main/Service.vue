@@ -110,81 +110,29 @@ const reset = () => {
     pageStore.loadData();
 }
 
-// 点击预约：先校验当前患者在 nursereserve 表中是否有 status 为 "服务中" 的记录
+// 点击预约：业务校验统一由后端处理，这里仅做登录与必要字段预填
 const reserve = async (service) => {
     const patientId = userStore.userInfo?.id;
     if (!patientId) {
         ElMessage.warning('请先登录再预约');
         return;
     }
-    try {
-        // 护工预约查询，兼容后端返回数组或单个对象
-        const resN = await request.get(`/nurseReserve/selectByPatientId/${patientId}`);
-        const rawN = resN?.data;
-        const nurseList = Array.isArray(rawN) ? rawN : (rawN ? [rawN] : []);
-        // 判断是否存在待审核
-        const hasPendingNurse = nurseList.some(i => {
-            const statusVal = String((i?.status ?? i?.state ?? '')).trim();
-            return statusVal === '待审核';
-        });
-        if (hasPendingNurse) {
-            ElMessage.warning('已有护工预约处于待审核，无法预约护理服务');
-            return;
-        }
-        // 找到服务中的护工记录
-        const active = nurseList.find(i => {
-            const statusVal = String((i?.status ?? i?.state ?? '')).trim();
-            return statusVal === '服务中';
-        });
-        if (!active) {
-            ElMessage.warning('请先预约护工并处于 "服务中" 后才能预约护理服务');
-            return;
-        }
 
-        // 额外检查：患者是否已有正在进行的护理服务（避免重复预约）
-        const resS = await request.get(`/serviceReserve/selectByPatientId/${patientId}`);
-        const rawS = resS?.data;
-        const svcList = Array.isArray(rawS) ? rawS : (rawS ? [rawS] : []);
-        const hasActiveService = svcList.some(i => String((i?.status ?? '')).trim() === '服务中');
-        if (hasActiveService) {
-            ElMessage.warning('您已有正在服务中的护理服务，无法重复预约');
-            return;
-        }
-
-        // 尽量兼容不同命名的护工 id 字段
-        const activeNurseId = active?.nurseId ?? active?.nurse_id ?? active?.id;
-        if (!activeNurseId) {
-            ElMessage.warning('未找到正在服务的护工信息，无法预约');
-            return;
-        }
-
-        // 记录护工预约开始/结束日期供后续校验（兼容命名 startDate/start_date, endDate/end_date）
-        const nurseStart = active?.startDate ?? active?.start_date ?? null;
-        const nurseEnd = active?.endDate ?? active?.end_date ?? null;
-
-        // 预填表单（保留 service.price 作为单价）
-        const svcId = service?.id;
-        if (!svcId) {
-            ElMessage.error('未获取到护理服务ID，无法预约');
-            return;
-        }
-
-        data.form = {
-            service_id: Number(svcId),
-            nurse_id: Number(activeNurseId),
-            patient_id: Number(patientId),
-            service_price: Number(service.price ?? 0),
-            status: '待审核',
-            nurseReserveStartDate: nurseStart,
-            nurseReserveEndDate: nurseEnd
-        };
-        data.reserveDialogVisible = true;
-    } catch (e) {
-        console.error('检查护工/服务预约记录失败', e);
-        ElMessage.error('无法验证预约状态，无法预约');
+    const svcId = service?.id;
+    if (!svcId) {
+        ElMessage.error('未获取到护理服务ID，无法预约');
         return;
     }
-}
+
+    // nurse_id 将由后端根据当前“服务中”的护工预约进行校验，这里不再强依赖前端查询
+    data.form = {
+        service_id: Number(svcId),
+        patient_id: Number(patientId),
+        service_price: Number(service.price ?? 0),
+        status: '待审核'
+    };
+    data.reserveDialogVisible = true;
+ }
 
 const saveReserve = () => {
     reserveFormRef.value?.validate(async (valid) => {
@@ -192,43 +140,10 @@ const saveReserve = () => {
             ElMessage.error('表单校验未通过，请检查输入项');
             return;
         }
-        if (!data.form.nurse_id) {
-            ElMessage.error('未找到护工信息，无法预约');
-            return;
-        }
         if (!data.form.service_id) {
             ElMessage.error('未找到护理服务信息，无法预约');
             return;
         }
-
-        // ---- 新增校验：服务开始/结束需在护工预约区间内（按日期比较，忽略时分） ----
-        const nurseStartRaw = data.form.nurseReserveStartDate ?? data.form.nurse_reserve_start_date ?? null;
-        const nurseEndRaw = data.form.nurseReserveEndDate ?? data.form.nurse_reserve_end_date ?? null;
-
-        const svcStart = new Date(data.form.startDate); 
-        svcStart.setHours(0,0,0,0);
-
-        // 校验开始不能早于护工开始
-        if (nurseStartRaw) {
-            const nurseStart = new Date(nurseStartRaw); 
-            nurseStart.setHours(0,0,0,0);
-            if (svcStart < nurseStart) {
-                ElMessage.error('服务开始日期不能早于护工预约开始日期');
-                return;
-            }
-        }
-        // 校验结束不能晚于护工结束（仅当护工有结束日期且用户填写了结束日期时）
-        if (nurseEndRaw && data.form.endDate) {
-            const nurseEnd = new Date(nurseEndRaw); 
-            nurseEnd.setHours(0,0,0,0);
-            const svcEnd = new Date(data.form.endDate); 
-            svcEnd.setHours(0,0,0,0);
-            if (svcEnd > nurseEnd) {
-                ElMessage.error('服务结束日期不能晚于护工预约结束日期');
-                return;
-            }
-        }
-        // -----------------------------------------------------------------------
 
         // 计算天数（包含开始与结束），若未填写结束日期则视为 1 天
         let days = 1;
@@ -256,7 +171,7 @@ const saveReserve = () => {
         // 构造待提交 payload（等待用户在支付弹窗确认）
         data.pendingReservePayload = {
             patientId: Number(data.form.patient_id),
-            nurseId: Number(data.form.nurse_id),
+            // nurseId 不再由前端传入，后端会基于当前“服务中”的护工预约进行校验
             serviceId: Number(data.form.service_id),
             status: data.form.status || '待审核',
             startDate: data.form.startDate,
@@ -298,7 +213,7 @@ const confirmPay = async () => {
         }
     } catch (e) {
         console.error('confirmPay error', e);
-        ElMessage.error('提交预约失败');
+        ElMessage.error(e?.response?.data?.msg || e?.response?.data?.message || '提交预约失败');
     }
 };
 

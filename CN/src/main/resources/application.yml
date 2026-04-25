@@ -10,6 +10,14 @@ spring:
     password: 123456
     url: jdbc:mysql://localhost:3306/xm-cn?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
 
+  servlet:
+    multipart:
+      enabled: true
+      # 单文件最大（按需调整）
+      max-file-size: 5MB
+      # 单次请求最大（按需调整）
+      max-request-size: 10MB
+
 # 配置mybatis实体和xml映射
 mybatis:
   # 映射xml
@@ -19,6 +27,30 @@ mybatis:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
     #驼峰命名法，将数据库中department_id转化成java中的departmentId
+jwt:
+  secret: "J6gF8WqP2rT4vY7zA1bC3dE5fG7hI9jK1lM3nO5pQ7rS9tU"
+  accessExpireSeconds: 900
+  refreshExpireSeconds: 604800
+
+# AI 大模型配置（仅后端保存，不要暴露到前端）
+ai:
+  # OpenAI 兼容 baseUrl，例如：
+  # - https://api.openai.com/v1
+  # - https://api.deepseek.com/v1
+  baseUrl: https://api.deepseek.com
+  # 建议用环境变量注入：DEEPSEEK_API_KEY / OPENAI_API_KEY
+  # Windows 示例：在系统环境变量中新增 DEEPSEEK_API_KEY=你的key
+  apiKey: ${DEEPSEEK_API_KEY:}
+  model: deepseek-chat
+  temperature: 0.2
+  # 限制模型最大输出 token（大致影响费用与内容长度）
+  maxTokens: 120
+  # 返回给前端前按“字符数”兜底截断（与你前端 100 字一致）
+  maxChars: 100
+
+# 文件上传的存储目录（默认：{user.dir}/files）
+files:
+  storageDir: ${user.dir}/files
 
 # 文件上传的前缀url
 #fileBaseUrl: http://106.55.55.56:5018

@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.common.Result;
+import com.example.dto.ServiceReserveAddRequest;
 import com.example.entity.PageQuery;
 import com.example.entity.ServiceReserve;
 import com.example.service.ServiceReserveService;
@@ -21,8 +22,8 @@ public class ServiceReserveController {
 
     //新增
     @PostMapping("/add")
-    public Result add(@Valid @RequestBody ServiceReserve serviceReserve) {
-        serviceReserveService.add(serviceReserve);
+    public Result add(@Valid @RequestBody ServiceReserveAddRequest request) {
+        serviceReserveService.addFromRequest(request);
         return Result.success();
     }
 

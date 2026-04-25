@@ -62,7 +62,18 @@ const login = () => {
             request.post('/login', data.form).then(res => {
                 if (res.code === '200') {
                     ElMessage.success('登陆成功')
-                    userStore.updateUserInfo(res.data);
+                    // 后端现在返回：{ user, accessToken, tokenType }
+                    const payload = res.data || {}
+                    const user = payload.user || {}
+                    const accessToken = payload.accessToken
+
+                    // 兼容旧逻辑：把 user 字段铺平，并保留 token 字段给拦截器读取
+                    userStore.updateUserInfo({
+                        ...user,
+                        accessToken,
+                        tokenType: payload.tokenType || 'Bearer'
+                    });
+
                     router.push('/home')
                 } else {
                     ElMessage.error(res.msg)
